@@ -1,0 +1,207 @@
+<?php
+/**
+ * Gerado por Rlustosa
+ * Rupert Brasil Lustosa rupertlustosa@gmail.com
+ * Date: {{date}}
+ * Time: {{time}}
+ */
+
+namespace App\Services;
+
+//use App\ImagemUpload;
+use Illuminate\Http\Request;
+use App\Http\Requests\{{class}}Request;
+use App\Repositories\{{class}}Repository;
+//use App\Traits\ImagemUploadTraitService;
+
+class {{class}}Service
+{
+    //use ImagemUploadTraitService;
+    /**
+     * Instância de {{class}}Repository
+     * @var {{class}}Repository
+     */
+    protected ${{variavelDaClasse}}Repository;
+
+    /**
+     * Criar uma nova nova instância de {{class}}Service
+     */
+    public function __construct()
+    {
+        $this->{{variavelDaClasse}}Repository = new {{class}}Repository();
+    }
+
+    /**
+     * Exibir uma lista de registros
+     * @param Request $request
+     * @param array $ordenacao
+     * @return array
+     */
+    public function index(Request $request, $ordenacao)
+    {
+        $parametros = [];
+        if ($request->query('id'))
+            $parametros['id'] = (int)$request->get('id');
+
+        if ($request->query('termo'))
+            $parametros['termo'] = trim($request->get('termo'));
+
+        if ($request->query('sort'))
+            $parametros['sort'] = $request->get('sort');
+
+        //if ($request->query('{{variavelDaClasse}}'))
+        //    $parametros['{{variavelDaClasse}}'] = $request->get('{{variavelDaClasse}}');
+
+        return $this->{{variavelDaClasse}}Repository->index(20, $parametros, $ordenacao);
+    }
+
+    /**
+     * Retornar um registro
+     * @param int $id
+     * @return \App\Models\{{class}}
+     */
+    public function find($id)
+    {
+        return $this->{{variavelDaClasse}}Repository->find($id);
+    }
+    
+    /**
+     * Armazenar o novo registro no repositório de dados.
+     * @param {{class}}Request ${{variavelDaClasse}}Request
+     * @return \App\Models\{{class}}
+     */
+    public function store({{class}}Request ${{variavelDaClasse}}Request)
+    {
+        $dados = ${{variavelDaClasse}}Request->all();
+
+        /*
+        ## REMOVER SE NÃO USAR ##
+        if(${{variavelDaClasse}}Request->hasFile('imagem')){
+            $imagem = (new ImagemUpload())
+                ->campo(${{variavelDaClasse}}Request['imagem'])
+                ->caminho('{{table}}')
+                ->build();
+            $nome_imagem = $this->enviaImagem($imagem);
+            $dados = array_merge($dados, ['imagem' => $nome_imagem]);
+        }*/
+        return $this->{{variavelDaClasse}}Repository->store($dados);
+    }
+
+    /**
+     * Atualizar o registro especificado.
+     * @param {{class}}Request ${{variavelDaClasse}}Request
+     * @param int $id
+     * @return \App\Models\{{class}}
+     */
+    public function update(
+        {{class}}Request ${{variavelDaClasse}}Request,
+        $id)
+    {
+        $dados = ${{variavelDaClasse}}Request->all();
+
+        /*
+        ## REMOVER SE NÃO USAR ##
+        if(${{variavelDaClasse}}Request->hasFile('imagem')){
+            $imagem = (new ImagemUpload())
+                ->campo(${{variavelDaClasse}}Request['imagem'])
+                ->caminho('{{table}}')
+                ->build();
+            $nome_imagem = $this->enviaImagem($imagem);
+            $dados = array_merge($dados, ['imagem' => $nome_imagem]);
+        }*/
+        return $this->{{variavelDaClasse}}Repository->update($dados, $id);
+    }
+
+    /**
+     * Exibir um formulário de confirmação de exclusão de um registro específico.
+     * @param int $id
+     * @return array
+     */
+    public function confirmDestroy($id)
+    {
+        $verificacao = [];
+        ${{variavelDaClasse}} = $this->{{variavelDaClasse}}Repository->find($id);
+
+        ${{variavelDaClasse}}TemRegistros = $this->{{variavelDaClasse}}Repository->{{variavelDaClasse}}TemRegistros(${{variavelDaClasse}});
+
+        if (${{variavelDaClasse}}TemRegistros->count()) {
+            $verificacao['{{variavelDaClasse}}'] = ['mensagem' => 'Existem registros relacionados a esse ítem!', 'registros' => ${{variavelDaClasse}}TemRegistros];
+        }
+
+        return ['item' => ${{variavelDaClasse}}, 'verificacao' => $verificacao];
+    }
+
+    /**
+     * Excluir um registro.
+     * @param int $id
+     * @return string
+     * @throws \Exception
+     */
+    public function destroy($id)
+    {
+        $response = $this->confirmDestroy($id);
+        $item = $response['item'];
+        $verificacao = $response['verificacao'];
+
+        if (count($verificacao) == 0) {
+            if ($this->{{variavelDaClasse}}Repository->destroy($item))
+                $mensagem = 'Registro "' . $item->id . '" removido com sucesso';
+            else $mensagem = 'Ocorreu um erro ao remover esse registro "' . $item->id . '", tente novamente';
+        } else {
+            $mensagem = 'Esse ítem possui registros relacionados!';
+        }
+        return $mensagem;
+    }
+
+    /**
+     * Recuperar uma coleção de {{class}} para o listBox
+     * @return array
+     */
+    public function listBox()
+    {
+        $list[''] = '';
+
+        foreach ($this->{{variavelDaClasse}}Repository->listBox() as $item) {
+            $list[$item->id] = $item->id;
+        }
+
+        return $list;
+    }
+
+    public function all()
+    {
+        return $this->{{variavelDaClasse}}Repository->all();
+    }
+
+    ## REMOVER SE NÃO USAR ##
+    /**
+     * Remover fisicamente uma imagem
+     * @param int $id
+     * @param int $ordemImagem
+     * @return bool
+     */
+    public function imageDestroy($id, $ordemImagem)
+    {
+        ${{variavelDaClasse}} = $this->{{variavelDaClasse}}Repository->find($id);
+
+        $campoRemover = 'imagem' . $ordemImagem;
+        $imagem = ${{variavelDaClasse}}->$campoRemover;
+
+        if ($imagem) {
+            $pasta = config('configuracoes.upload.{{table}}.caminho');
+            $pastaOriginal = config('configuracoes.upload.{{table}}.caminhoOriginal');
+
+            $caminho_imagem_original = $pastaOriginal . $imagem;
+            $caminho_imagem = $pasta . $imagem;
+
+            if (\Storage::exists($caminho_imagem_original))
+                \Storage::delete($caminho_imagem_original);
+
+            if (\Storage::exists($caminho_imagem))
+                \Storage::delete($caminho_imagem);
+
+            return $this->{{variavelDaClasse}}Repository->imageDestroy(${{variavelDaClasse}}, $campoRemover);
+        }
+        return false;
+    }
+}

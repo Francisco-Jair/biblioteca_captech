@@ -1,0 +1,47 @@
+<?php
+/**
+ * Gerado por Rlustosa
+ * Rupert Brasil Lustosa rupertlustosa@gmail.com
+ * Date: {{date}}
+ * Time: {{time}}
+ */
+
+namespace App\Http\Requests;
+
+class {{class}}Request extends Request
+{
+
+    /**
+     * Regras de validação que se aplicam a solicitação padrão.
+     *
+     * @var array
+     */
+    protected $regras = [
+        {{regras}}
+    ];
+
+    /**
+     * Retorna as regras de validação que se aplicam a solicitação padrão.
+     *
+     * @return array
+     */
+    public function rules()
+    {
+        //$id = ((int)$this->route('{{table}}') > 0) ? ',' . $this->route('{{table}}') : '';
+
+        $rules = [
+            {{thisRegras}}
+        ];
+
+        return $rules;
+    }
+
+    /**
+     * Determine se o usuário está autorizado a fazer este pedido.
+     * @return bool
+     */
+    public function authorize()
+    {
+        return true;
+    }
+}

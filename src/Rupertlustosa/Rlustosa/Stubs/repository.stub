@@ -1,0 +1,207 @@
+<?php
+/**
+ * Gerado por Rlustosa
+ * Rupert Brasil Lustosa rupertlustosa@gmail.com
+ * Date: {{date}}
+ * Time: {{time}}
+ */
+
+namespace App\Repositories;
+
+use App\Models\{{class}};
+
+class {{class}}Repository
+{
+
+    /**
+     * Criar uma nova instância de {{class}}Repository.
+     */
+    public function __construct()
+    {
+        $this->model = new {{class}}();
+    }
+
+
+    /**
+     * Recuperar uma Coleção paginada de {{class}}
+     * @param int $registros
+     * @param array $parametros
+     * @param array $ordenacao
+     * @return mixed
+     */
+
+    public function index($registros, $parametros = [], $ordenacao = [])
+    {
+        if (!isset($ordenacao['sort']))
+            $ordenacao['sort'] = 'id';
+
+        if (!isset($ordenacao['order']))
+            $ordenacao['order'] = 'DESC';
+
+        $query = $this->model->orderBy($ordenacao['sort'], $ordenacao['order']);
+
+        if (isset($parametros['id'])) {
+            $id = (int)$parametros['id'];
+
+            if (!empty($id)) {
+                $query = $query->whereId($id);
+            }
+        }
+
+        if (isset($parametros['{{variavelDaClasse}}'])) {
+            ${{variavelDaClasse}} = strtolower($parametros['{{variavelDaClasse}}']);
+
+            $query = $query->where(function ($q2) use (${{variavelDaClasse}}) {
+                $q2->whereRaw('LOWER({{variavelDaClasse}}) LIKE ?', ["%{${{variavelDaClasse}}}%"]);
+            });
+        }
+
+        /*if (isset($parametros['termo'])) {
+            $termo = strtolower(trim($parametros['termo']));
+
+            $query = $query->where(function ($q2) use ($termo) {
+                $q2->whereRaw(
+                    '(
+                        LOWER(xxx) LIKE ?
+                        or LOWER(yyy) LIKE ?
+                        or LOWER(zzz) LIKE ?
+                    )',
+                    [
+                        "%{$termo}%",
+                        "%{$termo}%",
+                        "%{$termo}%"
+                    ]
+                );
+            });
+        }*/
+
+        return $query->paginate($registros);
+    }
+
+    /**
+     * Recuperar um item do Model {{class}}
+     * @param  int $id
+     * @return {{class}} ${{variavelDaClasse}}
+     */
+    public function find($id)
+    {
+        return $item = $this->model->findOrFail($id);
+    }
+
+    /**
+     * Criar {{class}}
+     * @param array $dados
+     * @return {{class}} ${{variavelDaClasse}}
+     * @throws \Exception
+     */
+    public function store(array $dados)
+    {
+        ${{variavelDaClasse}} = new $this->model;
+        return $this->save{{class}}(${{variavelDaClasse}}, $dados);
+    }
+
+    /**
+     * Atualizar {{class}}.
+     *
+     * @param array $dados
+     * @param  int $id
+     * @return {{class}} ${{variavelDaClasse}}
+     * @throws \Exception
+     */
+    public function update(array $dados, $id)
+    {
+        ${{variavelDaClasse}} = $this->model->findOrFail($id);
+        return $this->save{{class}}(${{variavelDaClasse}}, $dados);
+    }
+
+    /**
+     * Salvar {{class}}.
+     * @param {{class}} ${{variavelDaClasse}}
+     * @param array $dados
+     * @return {{class}}
+     * @throws \Exception
+     */
+    private function save{{class}}({{class}} ${{variavelDaClasse}}, array $dados)
+    {
+        try {
+            {{camposParaSalvar}}
+
+            ${{variavelDaClasse}}->save();
+
+        } catch (\Exception $e) {
+            throw new \Exception($e);
+        }
+
+        return ${{variavelDaClasse}};
+    }
+
+
+    /**
+     * Verifica se o model tem dependência de algum outro model
+     * @param {{class}} ${{variavelDaClasse}}
+     * @return bool
+     */
+
+    public function {{variavelDaClasse}}TemRegistros({{class}} ${{variavelDaClasse}})
+    {
+        // Esse return é apenas para bloquear a exclusão.
+        return ${{variavelDaClasse}}->get();
+
+        //Se esse model possuir outro model relacionado:
+        //return ${{variavelDaClasse}}->metodoHasMany();
+
+        //Se esse model não possuir outro model relacionado:
+        return ${{variavelDaClasse}}->where('id', 0);
+    }
+
+    /**
+     * Excluir um registro.
+     * @param {{class}} ${{variavelDaClasse}}
+     * @return bool
+     * @throws \Exception
+     */
+    public function destroy({{class}} ${{variavelDaClasse}})
+    {
+        \DB::beginTransaction();
+        try {
+            ${{variavelDaClasse}}->delete();
+        } catch (\Exception $e) {
+            \DB::rollback();
+            throw new \Exception($e);
+        }
+        \DB::commit();
+
+        return true;
+    }
+
+    /**
+     * Recuperar um array de {{class}} para o listBox
+     * @return Illuminate\Database\Eloquent\Collection
+     */
+    public function listBox()
+    {
+        return $this->model
+            ->select('id', 'id')
+            ->orderBy('id', 'asc')
+            ->get();
+    }
+
+    public function all()
+    {
+        return $this->model->all();
+    }
+
+    ## REMOVER SE NÃO USAR ##
+    /**
+     * Remover uma imagem do banco de dados
+     * @param {{class}} ${{variavelDaClasse}}
+     * @param int $campoRemover
+     * @return bool
+     */
+    public function imageDestroy({{class}} ${{variavelDaClasse}}, $campoRemover)
+    {
+        ${{variavelDaClasse}}->$campoRemover = NULL;
+        ${{variavelDaClasse}}->save();
+        return true;
+    }
+}

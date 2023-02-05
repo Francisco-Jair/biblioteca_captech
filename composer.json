@@ -1,0 +1,38 @@
+{
+  "name": "rupertlustosa/rlustosa",
+  "description": "Generate a new Laravel structure based on data from the existing database table.",
+  "keywords": [
+    "laravel",
+    "generators",
+    "seed",
+    "artisan"
+  ],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Rupert Lustosa",
+      "email": "rupertlustosa@gmail.com"
+    }
+  ],
+  "repositories": [
+    {
+      "type": "vcs",
+      "url":  "git@bitbucket.org:rupertlustosa/rlustosa.git"
+    }
+  ],
+  "require": {
+    "php": ">=5.5.9"
+  },
+  "require-dev": {
+    "doctrine/dbal": "^2.5"
+  },
+  "autoload": {
+    "psr-0": {
+      "Rupertlustosa\\Rlustosa": "src/"
+    },
+    "classmap": [
+      "src/Rupertlustosa/Rlustosa/Exceptions.php"
+    ]
+  },
+  "minimum-stability": "dev"
+}

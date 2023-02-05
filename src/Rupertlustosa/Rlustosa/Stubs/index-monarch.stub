@@ -1,0 +1,155 @@
+<?php
+/**
+ * Gerado por Rlustosa
+ * Rupert Brasil Lustosa rupertlustosa@gmail.com
+ * Date: {{date}}
+ * Time: {{time}}
+ */
+
+?>
+@extends('gestor._layouts.monarch')
+
+@section('main')
+
+    <div id="page-title">
+        <h2>{{nomeDoLabel}}</h2>
+    </div>
+
+    <div class="row">
+        <div class="col-md-9">
+            <div class="row" id="barra_links">
+                <div class="pull-right">
+                    <a href="{{ URL::route('gestor.{{table}}.create') }}"
+                       id="link-create" class="btn btn-alt btn-hover btn-success">
+                        <span>Adicionar</span>
+                        <i class="glyph-icon icon-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            @include('gestor._layouts.sessionMensagem')
+
+            @if ($dados->count())
+                <table class="table table-bordered table-striped">
+                    <thead>
+                    <tr>
+{{camposTḧ}}
+                        <th width="150" class="text-center">Ações</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach ($dados as $item)
+                        <tr>
+{{camposTR}}
+                            <td class="text-center">
+                                <a href="{{ URL::route('gestor.{{table}}.show', [$item->id]) }}?read=true"
+                                    id="link-show-{{ $item->id }}"
+                                    data-id="{{ $item->id }}"
+                                    data-toggle="tooltip" data-placement="top"
+                                    title="Visualizar"
+                                    class="link-show btn btn-round btn-info tooltip-button">
+                                    <i class="glyph-icon icon-eye"></i>
+                                </a>
+
+                                <a href="{{ URL::route('gestor.{{table}}.edit', [$item->id]) }}"
+                                    id="link-edit-{{ $item->id }}"
+                                    data-id="{{ $item->id }}"
+                                    data-toggle="tooltip" data-placement="top"
+                                    title="Editar"
+                                    class="link-edit btn btn-round btn-blue-alt tooltip-button">
+                                    <i class="glyph-icon icon-iconic-pencil-alt"></i>
+                                </a>
+
+                                <a href="{{ URL::route('gestor.{{table}}.delete', [$item->id]) }}"
+                                   id="link-delete-{{ $item->id }}"
+                                   data-id="{{ $item->id }}"
+                                   data-toggle="tooltip" data-placement="top"
+                                   title="Remover"
+                                   class="link-delete btn btn-round btn-danger tooltip-button">
+                                    <i class="glyph-icon icon-trash-o"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    @endforeach
+
+                    </tbody>
+                </table>
+                {!! $dados->appends(Input::all())->render() !!}
+            @else
+                @include('gestor._layouts.naoExistemRegistros')
+            @endif
+
+        </div>
+
+        <div class="col-md-3">
+            <form name="frm_search_{{table}}"
+                  id="frm_search_{{table}}"
+                  method="get"
+                  action="{{ URL::route('gestor.{{table}}.index') }}"
+                  role="form">
+
+                <div class="well">
+                    <div class="row">
+                        {{camposDeBusca}}
+
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label for="id" class="col-sm-1 control-label">ID </label>
+
+                                {!! Form::text('id', ( \Request::query('id') ? \Request::query('id') : null),
+                                    [
+                                        'class'=>'form-control',
+                                        'id' => 'id',
+                                        'placeholder'=>'ID',
+                                        'value'=>Input::old('id')
+                                    ]
+                                ) !!}
+                            </div>
+                        </div>
+
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label for="termo" class="col-sm-2 control-label">Termo </label>
+
+                                {!! Form::text('termo', ( \Request::query('termo') ? \Request::query('termo') : null),
+                                    [
+                                        'class'=>'form-control',
+                                        'id' => 'termo',
+                                        'placeholder'=>'',
+                                        'value'=>Input::old('termo')
+                                    ]
+                                ) !!}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-12 text-right">
+                            <a href="{{ URL::route('gestor.{{table}}.index') }}"
+                               id="link-entrar-pagina"
+                               data-toggle="tooltip" data-placement="left"
+                               title="Limpar Filtros" style="margin-right: 5px"
+                               class="btn btn-alt btn-hover btn-danger tooltip-button">
+                                <span>Limpar</span>
+                                <i class="glyph-icon icon-eraser"></i>
+                            </a>
+
+                            <button type="submit"
+                                    id="button-filter"
+                                    data-toggle="tooltip" data-placement="top"
+                                    title="Filtrar"
+                                    class="btn btn-alt btn-hover btn-blue-alt tooltip-button pull-right">
+                                <span>Filtrar</span>
+                                <i class="glyph-icon icon-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+@endsection
+
+@section('scripts')
+
+@endsection

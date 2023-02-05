@@ -1,0 +1,26 @@
+"require": {
+    ....
+    "greggilbert/recaptcha": "^2.0",
+    "laravelcollective/html": "~5.0",
+    "intervention/image": "^2.3",
+    "barryvdh/laravel-debugbar": "^2.0",
+  }
+  ,
+    "require-dev": {
+      ....
+      "doctrine/dbal": "^2.6@dev",
+      "rupertlustosa/rlustosa": "dev-master"
+    },
+       "repositories": [
+         {
+           "type": "vcs",
+           "url":  "git@bitbucket.org:rupertlustosa/rlustosa.git"
+         }
+       ],
+    "autoload": {
+      "classmap": [
+        ...
+        "app/Helpers",
+      ]
+      ...
+    },

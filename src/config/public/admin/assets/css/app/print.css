@@ -1,0 +1,9 @@
+@media print {
+    body { margin: 0;  }
+    header nav, footer, .left-panel {
+        display: none;
+    }
+    a:after {
+        content: " [" attr(href) "] ";
+    }
+}

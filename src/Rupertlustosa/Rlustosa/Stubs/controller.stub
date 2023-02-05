@@ -1,0 +1,155 @@
+<?php
+/**
+ * Gerado por Rlustosa
+ * Rupert Brasil Lustosa rupertlustosa@gmail.com
+ * Date: {{date}}
+ * Time: {{time}}
+ */
+
+namespace App\Http\Controllers\Gestor;
+
+use Illuminate\Http\Request;
+use App\Traits\LogAtividades;
+use App\Http\Requests\{{class}}Request;
+use App\Services\{{class}}Service;
+
+class {{class}}Controller extends BaseController
+{
+    use LogAtividades;
+    /**
+     * Instância de {{class}}Service
+     *
+     * @var {{class}}Service
+     */
+    protected ${{variavelDaClasse}}Service;
+
+    /**
+     * Criar uma nova nova instância de {{class}}Controller
+     * @param {{class}}Service ${{variavelDaClasse}}Service
+     */
+    public function __construct({{class}}Service ${{variavelDaClasse}}Service)
+    {
+        $this->middleware('has.access:{{table}}.view', ['only' => ['index', 'show']]);
+        $this->middleware('has.access:{{table}}.create', ['only' => ['create', 'store']]);
+        $this->middleware('has.access:{{table}}.update', ['only' => ['edit', 'update']]);
+        $this->middleware('has.access:{{table}}.destroy', ['only' => ['destroy', 'confirmDestroy']]);
+
+        $this->{{variavelDaClasse}}Service = ${{variavelDaClasse}}Service;
+        $this->service = '{{variavelDaClasse}}Service';
+        $this->pastaView = '{{table}}';
+    }
+
+
+    /**
+     * Exibir uma lista paginada de registros.
+     *
+     * @param Request $request
+     * @return Response
+     */
+    public function index(Request $request)
+    {
+        $this->log(__METHOD__);
+
+        $camposPermitidosParaOrdenacao = ['id', 'created_at', 'updated_at'];
+
+        $ordenacao['sort'] = 'id';
+        $ordenacao['order'] = 'DESC';
+
+        if ($request->query('sort') and in_array($request->query('sort'), $camposPermitidosParaOrdenacao)) {
+            $ordenacao['sort'] = $request->query('sort');
+        }
+
+        if ($request->query('order')) {
+            $ordenacao['order'] = ($request->query('order') == 'ASC' ? 'ASC' : 'DESC');
+        }
+
+        $ordenacao['reverseOrder'] = ($ordenacao['order'] == 'ASC' ? 'DESC' : 'ASC');
+
+        $dados = $this->{{variavelDaClasse}}Service->index($request, $ordenacao);
+        $dados->setPath('./{{table}}');
+
+        return view('gestor.' . $this->pastaView . '.index', compact('dados', 'ordenacao'));
+    }
+
+    /**
+     * Exibir um registro específico.
+     *
+     * @param int $id
+     * @return Response
+     */
+    public function show($id)
+    {
+        $this->log(__METHOD__);
+
+        $item = $this->{{variavelDaClasse}}Service->find($id);
+
+        return view('gestor.'.$this->pastaView.'.form', compact('item'));
+    }
+
+    /**
+     * Exibir o formulário para criar um novo registro.
+     *
+     * @return Response
+     */
+    public function create()
+    {
+        $this->log(__METHOD__);
+
+        //$options_{{table}}_id = $this->{{variavelDaClasse}}Service->listBox();
+
+        return view('gestor.'.$this->pastaView.'.form');
+    }
+
+    /**
+     * Armazenar o novo registro.
+     *
+     * @param {{class}}Request ${{variavelDaClasse}}Request
+     * @return Response
+     */
+    public function store({{class}}Request ${{variavelDaClasse}}Request)
+    {
+        $this->log(__METHOD__);
+
+        $this->{{variavelDaClasse}}Service->store(${{variavelDaClasse}}Request);
+
+        return redirect()->route('gestor.'.$this->pastaView.'.index')
+            ->with('mensagem', 'Salvo com sucesso')
+            ->with('tipo_mensagem', 'success');
+    }
+
+    /**
+     * Exibir um formulário de edição de um registro específico.
+     *
+     * @param int $id
+     * @return Response
+     */
+    public function edit($id)
+    {
+        $this->log(__METHOD__);
+
+        //$options_{{table}}_id = $this->{{variavelDaClasse}}Service->listBox();
+        $item = $this->{{variavelDaClasse}}Service->find($id);
+
+        return view('gestor.'.$this->pastaView.'.form', compact('item'));
+    }
+
+    /**
+     * Atualizar um registro específico.
+     *
+     * @param {{class}}Request ${{variavelDaClasse}}Request
+     * @param int $id
+     * @return Response
+     */
+    public function update(
+        {{class}}Request ${{variavelDaClasse}}Request,
+        $id)
+    {
+        $this->log(__METHOD__);
+
+        $this->{{variavelDaClasse}}Service->update(${{variavelDaClasse}}Request, $id);
+
+        return redirect()->route('gestor.'.$this->pastaView.'.index')
+            ->with('mensagem', 'Atualizado com sucesso')
+            ->with('tipo_mensagem', 'success');
+    }
+}

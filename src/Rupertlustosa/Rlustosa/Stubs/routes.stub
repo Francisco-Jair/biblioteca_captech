@@ -1,0 +1,226 @@
+
+/*
+|--------------------------------------------------------------------------
+| Gênesis Application Routes
+|--------------------------------------------------------------------------
+|
+| Aqui estão as rotas geraadas automaticamente pelo comando
+| php artisan rlustosa:create-crud
+| Sinta-se a vontade de editá-las, porém não remova os comentários
+*/
+
+
+/*
+|--------------------------------------------------------------------------
+| Rota para limpar caches
+|--------------------------------------------------------------------------
+*/
+Route::get('clear', function () {
+    Artisan::call('clear-compiled');
+    Artisan::call('cache:clear');
+    Artisan::call('view:clear');
+    Cache::flush();
+
+    return view('clear');
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| Rotas para imagens
+|--------------------------------------------------------------------------
+*/
+get('images/{folder}/original/{filename}', function ($folder, $filename) {
+    $path = 'imgs/' . $folder . '/original/' . $filename;
+    $file = Storage::get($path);
+
+    return Image::make($file)->response();
+});
+
+get('images/{folder}/original/{width}/{filename}', function ($folder, $width, $filename) {
+    if ($width < 10 or $width > 1200)
+        $width = 10;
+    $path = 'imgs/' . $folder . '/original/' . $filename;
+    $file = Storage::get($path);
+    return Image::make($file)->resize($width, null, function ($constraint) {
+        $constraint->aspectRatio();
+    })->response();
+});
+
+get('images/{folder}/{filename}', function ($folder, $filename) {
+    $path = 'imgs/' . $folder . '/' . $filename;
+    $file = Storage::get($path);
+    //dd($file);
+    return Image::make($file)->response();
+});
+
+get('images/{folder}/{width}/{filename}', function ($folder, $width, $filename) {
+    if ($width < 10 or $width > 1200)
+        $width = 10;
+    $path = 'imgs/' . $folder . '/' . $filename;
+    $file = Storage::get($path);
+
+    return Image::make($file)->resize($width, null, function ($constraint) {
+        $constraint->aspectRatio();
+    })->response();
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| Rotas para o Site
+|--------------------------------------------------------------------------
+*/
+$router->group(['prefix' => '', 'namespace' => 'Site'], function ($router) {
+    $router->get('/', [
+        'as' => 'index',
+        'uses' => 'SiteController@index'
+    ]);
+
+    $router->get('/contato', [
+        'as' => 'site.contato',
+        'uses' => 'SiteController@contato'
+    ]);
+    $router->post('/contatoStore', [
+        'as' => 'assuntos.store',
+        'uses' => 'SiteController@contatoStore'
+    ]);
+
+    Route::get('/404', function () {
+        return view('site.404');
+    });
+
+    /*
+    |----------------------------------------------------------------------
+    | Novas rotas para o site
+    |----------------------------------------------------------------------
+    */
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| Rotas para autenticação
+|--------------------------------------------------------------------------
+*/
+$router->get('auth/login', ['uses' => 'Gestor\SessionController@login', 'as' => 'gestor.auth.login']);
+$router->post('auth/login', ['uses' => 'Gestor\SessionController@logar', 'as' => 'gestor.auth.login']);
+
+$router->get('auth/logout', ['uses' => 'Gestor\SessionController@destroy', 'as' => 'gestor.auth.logout']);
+$router->delete('auth/session', ['uses' => 'Gestor\SessionController@destroy', 'as' => 'gestor.session']);
+
+
+/*
+|--------------------------------------------------------------------------
+| Rotas para o Gestor
+|--------------------------------------------------------------------------
+*/
+$router->group(['middleware' => ['auth'],
+    'prefix' => 'gestor', 'namespace' => 'Gestor'], function ($router) {
+
+    // filemanager
+    $router->post('crop', function () {
+        return View::make('plugins/crop-image');
+    });
+
+    $router->get('filemanager/show', function () {
+        return View::make('plugins/filemanager');
+    });
+
+    $router->post('cookieMenu', function () {
+        $valorAtual = \Request::cookie('left-panel');
+        if ($valorAtual == 'collapsed')
+            $newValue = '';
+        else $newValue = 'collapsed';
+
+        $response = new Illuminate\Http\Response($newValue);
+        return $response->withCookie(cookie()->forever('left-panel', $newValue));
+    });
+
+    get('', ['as' => 'gestor.dashboard', 'uses' => 'DashboardController@dashboard']);
+
+    /* rotas para a url /gestor/configuracoes */
+    $router->resource('configuracoes', 'ConfiguracaoController');
+    $router->get('configuracoes/{id}/delete', [
+        'as' => 'gestor.configuracoes.delete',
+        'uses' => 'ConfiguracaoController@confirmDestroy'
+    ]);
+
+    /* rotas para a url /gestor/assuntos */
+    $router->resource('assuntos', 'AssuntoController');
+    $router->get('assuntos/{id}/delete', [
+        'as' => 'gestor.assuntos.delete',
+        'uses' => 'AssuntoController@confirmDestroy'
+    ]);
+
+    /* rotas para a url /gestor/contatos */
+    $router->resource('contatos', 'ContatoController');
+    $router->get('contatos/{id}/delete', [
+        'as' => 'gestor.contatos.delete',
+        'uses' => 'ContatoController@confirmDestroy'
+    ]);
+
+    /* rotas para a url /gestor/contato_configuracoes */
+    $router->resource('contato_configuracoes', 'ContatoConfiguracaoController');
+    $router->get('contato_configuracoes/{id}/delete', [
+        'as' => 'gestor.contato_configuracoes.delete',
+        'uses' => 'ContatoConfiguracaoController@confirmDestroy'
+    ]);
+
+    /* rotas para a url /gestor/gestores */
+    $router->resource('gestores', 'GestorController');
+    $router->get('gestores/{id}/delete', [
+        'as' => 'gestor.gestores.delete',
+        'uses' => 'GestorController@confirmDestroy'
+    ]);
+
+    /* Routes to /gestor/log_login_errado */
+    $router->resource('log_login_errado', 'LogLoginErradoController');
+    $router->get('log_login_errado/{id}/delete', [
+        'as' => 'gestor.log_login_errado.delete',
+        'uses' => 'LogLoginErradoController@confirmDestroy'
+    ])->where('id', '[0-9]+');
+
+    /* Routes to /gestor/log_login */
+    $router->resource('log_login', 'LogLoginController');
+    $router->get('log_login/{id}/delete', [
+        'as' => 'gestor.log_login.delete',
+        'uses' => 'LogLoginController@confirmDestroy'
+    ])->where('id', '[0-9]+');
+
+    /* Routes to /gestor/log_atividades */
+    $router->resource('log_atividades', 'LogAtividadeController');
+    $router->get('log_atividades/{id}/delete', [
+        'as' => 'gestor.log_atividades.delete',
+        'uses' => 'LogAtividadeController@confirmDestroy'
+    ])->where('id', '[0-9]+');
+
+	/*
+	|----------------------------------------------------------------------
+	| Novas rotas para o Gestor
+	|----------------------------------------------------------------------
+	*/
+
+    /*
+    SUGESTÕES DE ROTAS PARA IMAGEM E CROP
+    $router->get('pasta/imageCrop/{id}/{ordemImagem?}', [
+        'as' => 'gestor.pasta.imageCrop',
+        'uses' => 'PastaController@imageCrop'
+    ]);
+    $router->get('pasta/imageDestroy/{id}/{ordemImagem?}', [
+        'as' => 'gestor.pasta.imageDestroy',
+        'uses' => 'PastaController@imageDestroy'
+    ]);
+    $router->put('pasta/updateImageCrop/{id}', [
+        'as' => 'gestor.pasta.updateImageCrop',
+        'uses' => 'PastaController@updateImageCrop'
+    ]);
+    */
+
+});
+
+/*
+|--------------------------------------------------------------------------
+| Gênesis Application Routes - End
+|--------------------------------------------------------------------------
+*/
